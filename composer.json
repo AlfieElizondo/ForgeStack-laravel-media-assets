@@ -12,7 +12,7 @@
         "illuminate/bus": "^11.0|^12.0|^13.0",
         "illuminate/queue": "^11.0|^12.0|^13.0",
         "intervention/image": "^4.0",
-        "symfony/process": "^7.0"
+        "symfony/process": "^7.0|^8.0"
     },
     "require-dev": {
         "orchestra/testbench": "^9.0|^10.0",
