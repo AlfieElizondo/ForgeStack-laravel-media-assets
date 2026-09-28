@@ -31,8 +31,11 @@ class MediaAssetsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-
+        // Migrations are published, not auto-loaded: run
+        // `vendor:publish --tag=media-assets-migrations` then `migrate`.
+        // Auto-loading them here as well would register two files with
+        // the same migration name once published, and Laravel resolves
+        // that ambiguously depending on path registration order.
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../config/media-assets.php' => config_path('media-assets.php'),
