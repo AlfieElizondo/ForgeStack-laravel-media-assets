@@ -1,0 +1,52 @@
+{
+    "name": "forge-stack/laravel-media-assets",
+    "description": "Upload originals, generate derivatives, and extract EXIF/GPS metadata for a Laravel app — pluggable storage, derivative, and metadata drivers.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["laravel", "images", "media", "exif", "derivatives", "s3"],
+    "require": {
+        "php": "^8.3",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "illuminate/database": "^11.0|^12.0|^13.0",
+        "illuminate/http": "^11.0|^12.0|^13.0",
+        "illuminate/bus": "^11.0|^12.0|^13.0",
+        "illuminate/queue": "^11.0|^12.0|^13.0",
+        "intervention/image": "^4.0",
+        "symfony/process": "^7.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0",
+        "phpunit/phpunit": "^11.0|^12.0",
+        "league/flysystem-aws-s3-v3": "^3.35",
+        "mockery/mockery": "^1.6"
+    },
+    "suggest": {
+        "league/flysystem-aws-s3-v3": "Required to use the S3StorageDriver.",
+        "ext-imagick": "Recommended derivative driver — supports HEIC, TIFF, and ICC profiles; falls back to ext-gd otherwise."
+    },
+    "autoload": {
+        "psr-4": {
+            "ForgeStack\\MediaAssets\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ForgeStack\\MediaAssets\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ForgeStack\\MediaAssets\\MediaAssetsServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
