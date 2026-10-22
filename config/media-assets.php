@@ -100,6 +100,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Fallback to the original (M-01)
+    |--------------------------------------------------------------------------
+    |
+    | When false (default), urlFor() and temporaryUrlFor() return null for a
+    | profile without a derivative. The original is the full-resolution file
+    | and must not be served on public pages. Enable only for internal views
+    | where showing the original is acceptable.
+    |
+    */
+    'fallback_to_original' => (bool) env('MEDIA_ASSETS_FALLBACK_TO_ORIGINAL', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Derivative write disk
     |--------------------------------------------------------------------------
     |
