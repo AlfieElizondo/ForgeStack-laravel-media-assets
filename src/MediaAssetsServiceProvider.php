@@ -13,6 +13,7 @@ use ForgeStack\MediaAssets\Drivers\Derivatives\InterventionImageProcessor;
 use ForgeStack\MediaAssets\Drivers\Metadata\ExifToolMetadataExtractor;
 use ForgeStack\MediaAssets\Drivers\Storage\LocalPublicStorageDriver;
 use ForgeStack\MediaAssets\Drivers\Storage\S3StorageDriver;
+use ForgeStack\MediaAssets\Support\ProductionStorageGuard;
 use Illuminate\Support\ServiceProvider;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
@@ -31,6 +32,8 @@ class MediaAssetsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        ProductionStorageGuard::assertSafe($this->app);
+
         // Migrations are published, not auto-loaded: run
         // `vendor:publish --tag=media-assets-migrations` then `migrate`.
         // Auto-loading them here as well would register two files with

@@ -100,6 +100,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Local storage in production (M-02)
+    |--------------------------------------------------------------------------
+    |
+    | 'local' writes originals to a public disk. The app refuses to boot in
+    | production with it unless this escape is set explicitly.
+    |
+    */
+    'allow_local_in_production' => (bool) env('MEDIA_ASSETS_ALLOW_LOCAL_IN_PRODUCTION', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Fallback to the original (M-01)
     |--------------------------------------------------------------------------
     |
