@@ -56,7 +56,12 @@ $asset->urlFor('medium');
 // Private bucket — signed, expires in 15 minutes by default:
 $asset->temporaryUrlFor('medium');
 $asset->temporaryUrlFor('medium', expirationMinutes: 60);
+
+// Both return null when the derivative does not exist yet.
+$asset->hasDerivative('medium'); // bool
 ```
+
+Since 0.2.0 a missing derivative returns `null`, not the original. The original is the full-resolution file and is not served by default (`MEDIA_ASSETS_FALLBACK_TO_ORIGINAL=false`). Apps that relied on the old fallback must either handle `null` or set the flag to `true` for internal views. Upgrade notes: this is a breaking change, so the release is 0.2.0.
 
 Regenerate/backfill a derivative on demand:
 

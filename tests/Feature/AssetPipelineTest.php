@@ -164,11 +164,12 @@ class AssetPipelineTest extends TestCase
         $this->app->make(DerivativeGenerator::class)->ensure($asset, 'thumbnail');
     }
 
-    public function test_asset_url_for_falls_back_to_original_without_derivative(): void
+    public function test_asset_url_for_returns_null_without_derivative_by_default(): void
     {
+        // M-01: el original no se sirve por defecto (ver PrivateByDefaultTest).
         $asset = $this->makeAssetWithSource();
 
-        $this->assertSame($asset->originalUrl(), $asset->urlFor('thumbnail'));
+        $this->assertNull($asset->urlFor('thumbnail'));
     }
 
     public function test_upload_asset_action_creates_asset_and_dispatches(): void

@@ -98,30 +98,54 @@ class Asset extends Model
     }
 
     /**
-     * Public URL for the given derivative profile. Falls back to the
-     * original if the derivative doesn't exist yet (asset still
-     * Processing, or the profile isn't configured) so views never break
-     * during the transition.
+     * Whether the derivative for this profile exists and can be served.
      */
-    public function urlFor(string $profile): string
+    public function hasDerivative(string $profile): bool
     {
-        $derivative = $this->relationLoaded('derivatives')
-            ? $this->derivatives->firstWhere('profile', $profile)
-            : $this->derivatives()->where('profile', $profile)->first();
-
-        return $derivative?->url() ?? $this->originalUrl();
+        return $this->derivativeFor($profile) !== null;
     }
 
     /**
-     * Same fallback behavior as urlFor(), but signed — use this for a
-     * private bucket.
+     * Public URL for the given derivative profile, or null when the
+     * derivative does not exist yet. The original is only returned when
+     * `media-assets.fallback_to_original` is enabled (M-01): the original is
+     * the full-resolution print file and must not reach public pages by default.
      */
-    public function temporaryUrlFor(string $profile, int $expirationMinutes = 15): string
+    public function urlFor(string $profile): ?string
     {
-        $derivative = $this->relationLoaded('derivatives')
+        $derivative = $this->derivativeFor($profile);
+
+        if ($derivative !== null) {
+            return $derivative->url();
+        }
+
+        return $this->fallsBackToOriginal() ? $this->originalUrl() : null;
+    }
+
+    /**
+     * Signed version of urlFor(), for private buckets. Same rules: null
+     * without a derivative unless the original fallback is enabled.
+     */
+    public function temporaryUrlFor(string $profile, int $expirationMinutes = 15): ?string
+    {
+        $derivative = $this->derivativeFor($profile);
+
+        if ($derivative !== null) {
+            return $derivative->temporaryUrl($expirationMinutes);
+        }
+
+        return $this->fallsBackToOriginal() ? $this->originalTemporaryUrl($expirationMinutes) : null;
+    }
+
+    private function derivativeFor(string $profile): ?AssetDerivative
+    {
+        return $this->relationLoaded('derivatives')
             ? $this->derivatives->firstWhere('profile', $profile)
             : $this->derivatives()->where('profile', $profile)->first();
+    }
 
-        return $derivative?->temporaryUrl($expirationMinutes) ?? $this->originalTemporaryUrl($expirationMinutes);
+    private function fallsBackToOriginal(): bool
+    {
+        return (bool) config('media-assets.fallback_to_original', false);
     }
 }
