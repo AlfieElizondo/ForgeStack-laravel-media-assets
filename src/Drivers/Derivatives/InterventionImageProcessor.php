@@ -31,9 +31,14 @@ final class InterventionImageProcessor implements ImageProcessor
             height: $profile->maxHeight,
         );
 
+        // M-03: derivatives are public, so strip EXIF/XMP/IPTC (camera, author,
+        // serial number, GPS). Intervention keeps the ICC profile when stripping,
+        // and the EXIF orientation is already applied to the pixels on decode.
+        // Intervention's PngEncoder has no strip option: avoid 'png' for public
+        // derivatives of photos that may carry metadata.
         $encoder = match ($profile->format) {
-            'jpg', 'jpeg' => new JpegEncoder(quality: $profile->quality, progressive: true),
-            'webp' => new WebpEncoder(quality: $profile->quality),
+            'jpg', 'jpeg' => new JpegEncoder(quality: $profile->quality, progressive: true, strip: true),
+            'webp' => new WebpEncoder(quality: $profile->quality, strip: true),
             'png' => new PngEncoder,
         };
 
