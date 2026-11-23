@@ -154,7 +154,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Pattern used to build a derivative's path. Tokens:
-    |   {asset_id}   -> the Asset's numeric id
+    |   {asset_id}   -> the Asset's numeric id (guessable: avoid on public buckets)
+    |   {asset_hash} -> 32-char HMAC of the id keyed with app.key (unguessable, stable)
     |   {profile}    -> profile name (thumbnail/medium/large/web/...)
     |   {extension}  -> derived from the profile's `format`
     |

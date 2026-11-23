@@ -78,8 +78,25 @@ final class InterventionDerivativeGenerator implements DerivativeGenerator
 
         return strtr($template, [
             '{asset_id}' => (string) $asset->id,
+            '{asset_hash}' => str_contains($template, '{asset_hash}') ? self::assetHash($asset) : '',
             '{profile}' => $profile->name,
             '{extension}' => $profile->extension(),
         ]);
+    }
+
+    /**
+     * Unguessable but stable folder name for an asset's derivatives: an HMAC of the
+     * asset id keyed with the app key. Public buckets can't be enumerated by id.
+     * Rotating APP_KEY changes future paths; existing rows keep their stored path.
+     */
+    private static function assetHash(Asset $asset): string
+    {
+        $key = (string) config('app.key');
+
+        if ($key === '') {
+            throw new RuntimeException('The {asset_hash} derivative path token needs app.key to be set.');
+        }
+
+        return substr(hash_hmac('sha256', 'media-assets:derivatives:'.$asset->id, $key), 0, 32);
     }
 }
