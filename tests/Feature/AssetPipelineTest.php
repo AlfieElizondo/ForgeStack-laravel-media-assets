@@ -131,6 +131,47 @@ class AssetPipelineTest extends TestCase
         $this->assertSame(800, $derivative->width);
     }
 
+    public function test_the_default_derivative_path_keeps_the_numeric_id(): void
+    {
+        $this->app->instance(ImageProcessor::class, $this->fakeImageProcessor());
+        $asset = $this->makeAssetWithSource();
+
+        $derivative = $this->app->make(DerivativeGenerator::class)->ensure($asset, 'thumbnail');
+
+        $this->assertSame('derivatives/'.$asset->id.'/thumbnail.jpg', $derivative->storage_path);
+    }
+
+    public function test_the_asset_hash_token_makes_derivative_paths_unguessable(): void
+    {
+        config([
+            'app.key' => 'base64:'.base64_encode(str_repeat('k', 32)),
+            'media-assets.derivative_path' => 'derivatives/{asset_hash}/{profile}.{extension}',
+        ]);
+        $this->app->instance(ImageProcessor::class, $this->fakeImageProcessor());
+        $first = $this->makeAssetWithSource();
+        $second = Asset::factory()->create(['disk' => 'public', 'storage_path' => $first->storage_path]);
+        $generator = $this->app->make(DerivativeGenerator::class);
+
+        $a = $generator->ensure($first, 'thumbnail')->storage_path;
+        $b = $generator->ensure($second, 'thumbnail')->storage_path;
+
+        $this->assertMatchesRegularExpression('#^derivatives/[a-f0-9]{32}/thumbnail\.jpg$#', $a);
+        $this->assertNotSame($a, $b);
+        $this->assertSame($a, $generator->ensure($first, 'thumbnail')->storage_path, 'El hash es estable para el mismo asset.');
+        $this->assertStringNotContainsString('/'.$first->id.'/', $a);
+    }
+
+    public function test_the_asset_hash_token_refuses_to_work_without_an_app_key(): void
+    {
+        config(['app.key' => '', 'media-assets.derivative_path' => 'derivatives/{asset_hash}/{profile}.{extension}']);
+        $this->app->instance(ImageProcessor::class, $this->fakeImageProcessor());
+        $asset = $this->makeAssetWithSource();
+
+        $this->expectException(\RuntimeException::class);
+
+        $this->app->make(DerivativeGenerator::class)->ensure($asset, 'thumbnail');
+    }
+
     public function test_derivative_generator_is_idempotent(): void
     {
         $this->app->instance(ImageProcessor::class, $this->fakeImageProcessor());
